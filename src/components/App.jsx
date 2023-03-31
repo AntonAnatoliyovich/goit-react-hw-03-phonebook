@@ -9,13 +9,23 @@ export class App extends Component {
     super();
     this.state = {
       contacts: [
-        { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-        { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-        { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-        { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
+        // { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+        // { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+        // { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+        // { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
       ],
       filter: '',
     };
+    this.localStorageKey = 'addedContacts';
+  }
+
+  componentDidMount() {
+    this.contactsArray = JSON.parse(localStorage.getItem(this.localStorageKey)) || []
+    if(this.contactsArray.length > 0) {
+      this.setState(({ contacts }) => ({
+        contacts: [...this.contactsArray],
+      }));
+    }
   }
 
   addContact = event => {
@@ -28,6 +38,8 @@ export class App extends Component {
     if (exists) {
       alert(`${event.name} is already in contacts!`);
     } else {
+      this.contactsArray.push(event)
+      localStorage.setItem(this.localStorageKey, JSON.stringify(this.contactsArray))
       this.setState(({ contacts }) => ({
         contacts: [...contacts, event],
       }));
@@ -46,10 +58,13 @@ export class App extends Component {
     );
   };
 
-  deleteContact = id =>
+  deleteContact = id => {
+    this.contactsArray = this.contactsArray.filter(contact => contact.id !== id)
+    localStorage.setItem(this.localStorageKey, JSON.stringify(this.contactsArray))
     this.setState(({ contacts }) => ({
       contacts: contacts.filter(contact => contact.id !== id),
     }));
+  }
 
   render() {
     const { filter } = this.state;
